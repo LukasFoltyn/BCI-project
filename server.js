@@ -60,12 +60,14 @@ passport.use(new BasicStrategy(
 const jwt = require('jsonwebtoken')
 const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
+
+/*only for localhost
 const private = require('./private.json')
-const secretKey = private.jwtSignKey
+const secretKey = private.jwtSignKey */
 
 const options = {
     jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey : secretKey
+    secretOrKey : 'randomSecretKey'
 }
 
 passport.use(new JwtStrategy(options, (payload, done) => {
