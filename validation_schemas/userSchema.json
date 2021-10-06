@@ -130,5 +130,6 @@
                 "password1234"
             ]
         }
-    }
+    },
+    "additionalProperties": false
 }

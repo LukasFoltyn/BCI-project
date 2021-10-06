@@ -240,5 +240,6 @@
                 "john@foo.com"
             ]
         }
-    }
+    },
+    "additionalProperties": false
 }
