@@ -64,10 +64,11 @@ const ExtractJwt = require('passport-jwt').ExtractJwt
 /*only for localhost
 const private = require('./private.json')
 const secretKey = private.jwtSignKey */
+const secretKey = 'ThisShouldBeRandomStringForJsonWebTokenSecretKey' // normally read from local file
 
 const options = {
     jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey : process.env.SECRET_KEY /* || secretKey, <--- for localhost*/
+    secretOrKey : (process.env.SECRET_KEY || secretKey)
 }
 
 passport.use(new JwtStrategy(options, (payload, done) => {
@@ -220,7 +221,7 @@ app.post('/users', validateUserMiddleware, (req, res) => {
 
 app.post('/login', passport.authenticate('basic', { session : false }), (req, res) => {
 
-    const token = jwt.sign({ userId : req.user.id }, secretKey)
+    const token = jwt.sign({ userId : req.user.id }, (process.env.SECRET_KEY || secretKey))
 
     res.json({ token : token })
 
@@ -285,7 +286,7 @@ app.get('/postings', filterPostings, (req, res) => {
 
     filteredPostings.forEach((posting,index, arr) => {
         arr[index] = deepCopyImagesPosting(posting)
-        arr[index].images = imageToBase64(posting.images)
+        //arr[index].images = imageToBase64(posting.images) /* uncomment for local upload of files */
         delete arr[index].userId
     })
     res.status(200).json({ data : filteredPostings })
@@ -301,7 +302,7 @@ app.post('/postings', validatePostingMiddleware, passport.authenticate('jwt', { 
     }
 
     Object.assign(posting, req.body)
-    posting.images = base64toImage(posting.images)
+    //posting.images = base64toImage(posting.images)/* uncomment for local upload of files */
     postings.push(posting)
     res.status(201).json({ id : posting.id })
 })
@@ -316,7 +317,7 @@ app.get('/postings/:id', (req, res) => {
     else
     {
         posting = deepCopyImagesPosting(posting)
-        posting.images = imageToBase64(posting.images)
+        /*posting.images = imageToBase64(posting.images) *//* uncomment for local upload of files */
         delete posting.userId
         res.status(200).json(posting)
     }
@@ -337,9 +338,9 @@ app.put('/postings/:id', validatePostingMiddleware, passport.authenticate('jwt',
     else
     {
         //delete the stored images
-        posting.images.forEach(imagePath => fs.unlinkSync(imagePath))
+        //posting.images.forEach(imagePath => fs.unlinkSync(imagePath))/* uncomment for local upload of files */
         Object.assign(posting, req.body)
-        posting.images = base64toImage(posting.images)
+        //posting.images = base64toImage(posting.images) /* uncomment for local upload of files */
         res.status(200).json({ id : posting.id })
     }
 })
@@ -359,7 +360,7 @@ app.delete('/postings/:id', passport.authenticate('jwt', { session: false }),(re
     else
     {
         // delete the stored images
-        posting.images.forEach(imagePath => fs.unlinkSync(imagePath))
+        // posting.images.forEach(imagePath => fs.unlinkSync(imagePath)) /* uncomment for local upload of files */
         postings.splice(postings.indexOf(posting), 1)
         res.sendStatus(200)
     }
