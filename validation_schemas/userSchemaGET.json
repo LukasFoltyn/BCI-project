@@ -1,0 +1,133 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+            "firstName": "John",
+            "lastName": "Doe",
+            "dateOfBirth": "2012-09-27",
+            "address": {
+                "street": "Tutkijantie",
+                "city": "Oulu",
+                "country": "FIN"
+            },
+            "email": "john@foo.com"
+        }
+    ],
+    "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "dateOfBirth",
+        "address",
+        "email"
+    ],
+    "properties": {
+        "id": {
+            "$id": "#/properties/id",
+            "type": "string",
+            "title": "The id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "497f6eca-6276-4993-bfeb-53cbbbba6f08"
+            ]
+        },
+        "firstName": {
+            "$id": "#/properties/firstName",
+            "type": "string",
+            "title": "The firstName schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "John"
+            ]
+        },
+        "lastName": {
+            "$id": "#/properties/lastName",
+            "type": "string",
+            "title": "The lastName schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Doe"
+            ]
+        },
+        "dateOfBirth": {
+            "$id": "#/properties/dateOfBirth",
+            "type": "string",
+            "title": "The dateOfBirth schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "2012-09-27"
+            ]
+        },
+        "address": {
+            "$id": "#/properties/address",
+            "type": "object",
+            "title": "The address schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "street": "Tutkijantie",
+                    "city": "Oulu",
+                    "country": "FIN"
+                }
+            ],
+            "required": [
+                "street",
+                "city",
+                "country"
+            ],
+            "properties": {
+                "street": {
+                    "$id": "#/properties/address/properties/street",
+                    "type": "string",
+                    "title": "The street schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "Tutkijantie"
+                    ]
+                },
+                "city": {
+                    "$id": "#/properties/address/properties/city",
+                    "type": "string",
+                    "title": "The city schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "Oulu"
+                    ]
+                },
+                "country": {
+                    "$id": "#/properties/address/properties/country",
+                    "type": "string",
+                    "title": "The country schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "FIN"
+                    ]
+                }
+            },
+            "additionalProperties": true
+        },
+        "email": {
+            "$id": "#/properties/email",
+            "type": "string",
+            "title": "The email schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "john@foo.com"
+            ]
+        }
+    }
+}

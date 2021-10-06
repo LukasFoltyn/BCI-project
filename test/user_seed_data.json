@@ -1,0 +1,57 @@
+{
+    "validUsers" : [
+
+        {
+            "firstName": "John",
+            "lastName": "Doe",
+            "dateOfBirth": "2012-09-27",
+            "address": {
+              "street": "Tutkijantie",
+              "city": "Oulu",
+              "country": "FIN"
+            },
+            "email": "john@foo.com",
+            "password": "password1234"
+        },
+        {
+            "firstName": "Pepa",
+            "lastName": "Novak",
+            "dateOfBirth": "2000-09-04",
+            "address": {
+              "street": "neznamZadnouUlici",
+              "city": "Kosice",
+              "country": "SVK"
+            },
+            "email": "pep@bar.com",
+            "password": "damn1"
+        }
+
+    ],
+    "invalidUsers" : [
+
+        {
+            "lastName": "Doe",
+            "dateOfBirth": "2012-09-27",
+            "address": {
+              "street": "Tutkijantie",
+              "city": "Oulu",
+              "country": "FIN"
+            },
+            "email": "john@foo.com",
+            "password": "password1234"
+        },
+        {
+            "firstName": "Pepa",
+            "lastName": "Novak",
+            "dateOfBirth": "2000-09-04",
+            "address": {
+              "street": "neznamZadnouUlici",
+              "city": 2222,
+              "country": "SVK"
+            },
+            "email": "pep@bar.com",
+            "password": "damn1"
+        }
+
+    ]
+}

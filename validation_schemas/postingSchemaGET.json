@@ -1,0 +1,275 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+            "title": "Old table",
+            "description": "Table is 6 years old but still in good quality!",
+            "category": [
+                "furniture"
+            ],
+            "location": {
+                "street": "Tutkijantie",
+                "city": "Oulu",
+                "country": "FIN"
+            },
+            "images": [
+                "string"
+            ],
+            "askingPrice": 100.5,
+            "dateOfPosting": "2012-09-27",
+            "deliveryType": {
+                "shipping": true,
+                "pickup": true
+            },
+            "sellerFirstName": "Pepa",
+            "sellerLastName": "Novak",
+            "sellerEmail": "john@foo.com"
+        }
+    ],
+    "required": [
+        "id",
+        "title",
+        "description",
+        "category",
+        "location",
+        "images",
+        "askingPrice",
+        "dateOfPosting",
+        "deliveryType",
+        "sellerFirstName",
+        "sellerLastName",
+        "sellerEmail"
+    ],
+    "properties": {
+        "id": {
+            "$id": "#/properties/id",
+            "type": "string",
+            "title": "The id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "497f6eca-6276-4993-bfeb-53cbbbba6f08"
+            ]
+        },
+        "title": {
+            "$id": "#/properties/title",
+            "type": "string",
+            "title": "The title schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Old table"
+            ]
+        },
+        "description": {
+            "$id": "#/properties/description",
+            "type": "string",
+            "title": "The description schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Table is 6 years old but still in good quality!"
+            ]
+        },
+        "category": {
+            "$id": "#/properties/category",
+            "type": "array",
+            "title": "The category schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    "furniture"
+                ]
+            ],
+            "items": {
+                "$id": "#/properties/category/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/category/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "furniture"
+                        ]
+                    }
+                ]
+            }
+        },
+        "location": {
+            "$id": "#/properties/location",
+            "type": "object",
+            "title": "The location schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "street": "Tutkijantie",
+                    "city": "Oulu",
+                    "country": "FIN"
+                }
+            ],
+            "required": [
+                "street",
+                "city",
+                "country"
+            ],
+            "properties": {
+                "street": {
+                    "$id": "#/properties/location/properties/street",
+                    "type": "string",
+                    "title": "The street schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "Tutkijantie"
+                    ]
+                },
+                "city": {
+                    "$id": "#/properties/location/properties/city",
+                    "type": "string",
+                    "title": "The city schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "Oulu"
+                    ]
+                },
+                "country": {
+                    "$id": "#/properties/location/properties/country",
+                    "type": "string",
+                    "title": "The country schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "FIN"
+                    ]
+                }
+            },
+            "additionalProperties": true
+        },
+        "images": {
+            "$id": "#/properties/images",
+            "type": "array",
+            "title": "The images schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    "string"
+                ]
+            ],
+            "items": {
+                "$id": "#/properties/images/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/images/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "string"
+                        ]
+                    }
+                ]
+            }
+        },
+        "askingPrice": {
+            "$id": "#/properties/askingPrice",
+            "type": "number",
+            "title": "The askingPrice schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0,
+            "examples": [
+                100.5
+            ]
+        },
+        "dateOfPosting": {
+            "$id": "#/properties/dateOfPosting",
+            "type": "string",
+            "title": "The dateOfPosting schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "2012-09-27"
+            ]
+        },
+        "deliveryType": {
+            "$id": "#/properties/deliveryType",
+            "type": "object",
+            "title": "The deliveryType schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "shipping": true,
+                    "pickup": true
+                }
+            ],
+            "required": [
+                "shipping",
+                "pickup"
+            ],
+            "properties": {
+                "shipping": {
+                    "$id": "#/properties/deliveryType/properties/shipping",
+                    "type": "boolean",
+                    "title": "The shipping schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "pickup": {
+                    "$id": "#/properties/deliveryType/properties/pickup",
+                    "type": "boolean",
+                    "title": "The pickup schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                }
+            }
+        },
+        "sellerFirstName": {
+            "$id": "#/properties/sellerFirstName",
+            "type": "string",
+            "title": "The sellerFirstName schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Pepa"
+            ]
+        },
+        "sellerLastName": {
+            "$id": "#/properties/sellerLastName",
+            "type": "string",
+            "title": "The sellerLastName schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Novak"
+            ]
+        },
+        "sellerEmail": {
+            "$id": "#/properties/sellerEmail",
+            "type": "string",
+            "title": "The sellerEmail schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "john@foo.com"
+            ]
+        }
+    }
+}

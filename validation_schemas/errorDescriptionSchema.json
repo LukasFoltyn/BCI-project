@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "errorDescription": "Some data is missing or given data is incorrect"
+        }
+    ],
+    "required": [
+        "errorDescription"
+    ],
+    "properties": {
+        "errorDescription": {
+            "$id": "#/properties/errorDescription",
+            "type": "string",
+            "title": "The errorDescription schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Some data is missing or given data is incorrect"
+            ]
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjZjc2NGEzYS01N2EzLTQ5NjQtYTA3NS1lOTUxMjU4M2IzM2YiLCJpYXQiOjE2MzMzNTMxMjh9.kZo9bpFdJJX_wW1Kug_zrYwnRsdxBEHX6k17QcvS_wo"
+        }
+    ],
+    "required": [
+        "token"
+    ],
+    "properties": {
+        "token": {
+            "$id": "#/properties/token",
+            "type": "string",
+            "title": "The token schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjZjc2NGEzYS01N2EzLTQ5NjQtYTA3NS1lOTUxMjU4M2IzM2YiLCJpYXQiOjE2MzMzNTMxMjh9.kZo9bpFdJJX_wW1Kug_zrYwnRsdxBEHX6k17QcvS_wo"
+            ]
+        }
+    }
+}
