@@ -20,13 +20,13 @@ const idSchema = require('../validation_schemas/idSchema')
 let validPostingIds = []
 let jsonWebTokens = []
 
-const baseUrl = 'http://localhost:3030'
+const baseUrl = 'http://localhost:3000'
 
 describe('Posting requests', function() {
 
     before(function () {
 
-        server.start(3030)
+        server.start()
 
         // create 2 users
         userSeedData.validUsers.forEach(user => {

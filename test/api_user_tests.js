@@ -19,7 +19,7 @@ const jwtSchema = require('../validation_schemas/jwtSchema.json')
 let validUserIds = []
 let jsonWebToken = null
 
-const baseUrl = 'http://localhost:3030'
+const baseUrl = 'http://localhost:3000'
 
 describe('User requests', function() {
 

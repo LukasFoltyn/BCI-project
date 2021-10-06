@@ -15,6 +15,10 @@ const bcrypt = require('bcryptjs')
 
 const app = express()
 
+// if the application or tests are needed to be run, the port
+// has to be changed to 3000
+app.set('port',(process.env.PORT || 80))
+
 app.use(bodyParser.json())
 
 const Ajv = require('ajv')
@@ -364,8 +368,8 @@ let serverInstance = null
 
 module.exports = {
 
-    start : function(port) {
-        serverInstance = app.listen(port, () => {})
+    start : function() {
+        serverInstance = app.listen(app.get('port'), () => {})
     },
 
     close : function() {
