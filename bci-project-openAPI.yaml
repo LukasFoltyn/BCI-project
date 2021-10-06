@@ -1,0 +1,750 @@
+openapi: 3.1.0
+info:
+  title: Second hand shop
+  version: '1.0'
+  summary: API for second hand e-shop
+  description: This API serves for posting items that can be viewed by other users. Post can be made only by a registered user.
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /users:
+    post:
+      summary: CREATE a new user
+      operationId: post-signup
+      description: Endpoint for creating a new user
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/id'
+              examples: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-post_put'
+            examples: {}
+        description: User that is about to be created
+    parameters: []
+  '/users/{userId}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: userId
+        in: path
+        description: id that follows uuid format
+        required: true
+    get:
+      summary: GET information about particural user
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-get'
+              examples: {}
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-users-userId
+      description: Endpoint for displaying one particular user
+      security:
+        - HTTPBasic: []
+    delete:
+      summary: DELETE a particular user
+      operationId: delete-users-userId
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Endpoint for deleting a user with a given id
+      security:
+        - HTTPBasic: []
+    put:
+      summary: UPDATE a particular user
+      operationId: put-users-userId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/id'
+              examples: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples: {}
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Endpoint that serves for updating some information about a user
+      security:
+        - HTTPBasic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-post_put'
+            examples: {}
+        description: User information that will update the current info of chosen user
+  /login:
+    post:
+      summary: Login operation for the user
+      operationId: post-login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT for following authorizations of the user
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjZjc2NGEzYS01N2EzLTQ5NjQtYTA3NS1lOTUxMjU4M2IzM2YiLCJpYXQiOjE2MzMzNTMxMjh9.kZo9bpFdJJX_wW1Kug_zrYwnRsdxBEHX6k17QcvS_wo
+                required:
+                  - token
+              examples:
+                jwt-example:
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjZjc2NGEzYS01N2EzLTQ5NjQtYTA3NS1lOTUxMjU4M2IzM2YiLCJpYXQiOjE2MzMzNTMxMjh9.kZo9bpFdJJX_wW1Kug_zrYwnRsdxBEHX6k17QcvS_wo
+        '401':
+          description: Unauthorized
+      description: Endpoint for the user to be able to login with his email and password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: joe@foo.com
+                  description: This field should contain already registered email
+                password:
+                  type: string
+                  format: password
+                  example: password1234
+                  description: This field should contain a password to the corresponding email
+              required:
+                - email
+                - password
+            examples: {}
+        description: Request body contains email and password field. Both will be verified for the user to login.
+      security:
+        - HTTPBasic: []
+  /postings:
+    get:
+      summary: GET all possible postings
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/posting-get'
+              examples:
+                get-array-postings:
+                  value:
+                    data:
+                      - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                        title: Old table
+                        description: Table is 6 years old but still in good quality!
+                        category:
+                          - furniture
+                        location:
+                          street: Tutkijantie
+                          city: Oulu
+                          country: FIN
+                        images:
+                          - string
+                        askingPrice: 100.5
+                        dateOfPosting: '2012-09-27'
+                        deliveryType:
+                          shipping: true
+                          pickup: true
+                        sellerFirstName: Pepa
+                        sellerLastName: Novak
+                        sellerEmail: john@foo.com
+      operationId: get-postings
+      description: 'Endpoint that returns all postings. It is also possible to filter postings based on category, location and date of the posting'
+      parameters:
+        - schema:
+            type: array
+            example:
+              - cars
+              - furniture
+          in: query
+          name: categories
+          description: categories that will be used for filtering
+        - schema:
+            type: string
+            example: Tutkijantie
+            pattern: '^[A-Za-z]+'
+          in: query
+          name: street
+          description: street that will be used for filtering
+        - schema:
+            type: string
+            example: FIN
+          in: query
+          name: country
+          description: country in ISO 3166-1 alpha-3 format that will be used for filtering
+        - schema:
+            type: string
+            example: '2012-09-27'
+            minLength: 10
+            maxLength: 10
+          in: query
+          name: dateOfPostingStart
+          description: 'start date in ISO 8601 format that will be used for filtering '
+        - schema:
+            type: string
+            example: '2012-10-27'
+            minLength: 10
+            maxLength: 10
+          in: query
+          name: dateOfPostingEnd
+          description: 'end date in ISO 8601 format that will be used for filtering '
+        - schema:
+            type: string
+            pattern: '^[A-Za-z]+'
+            example: Oulu
+          in: query
+          name: city
+          description: city that will be used for filtering
+    post:
+      summary: CREATE a new posting
+      operationId: post-postings
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/id'
+              examples: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples: {}
+        '401':
+          description: Unauthorized
+      description: Endpoint that allows logged in user to create a new posting
+      security:
+        - HTTPBasic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/posting-post_put'
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+        description: Request body that holds information about posting that is about to be created
+  '/postings/{postingId}':
+    parameters:
+      - schema:
+          type: string
+        name: postingId
+        in: path
+        required: true
+    get:
+      summary: GET information about a particular posting
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/posting-get'
+              examples: {}
+        '404':
+          description: Not Found
+      operationId: get-postings-postingId
+      description: Endpoint that allows users to display one particular posting
+    put:
+      summary: UPDATE a particular posting
+      operationId: put-postings-postingId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/id'
+              examples: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples: {}
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Endpoint that allows logged in user that make changes to his postings
+      security:
+        - HTTPBasic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/posting-post_put'
+            examples: {}
+        description: 'Request body holding information that are used for updating a posting with a given id '
+    delete:
+      summary: DELETE a particular posting
+      operationId: delete-postings-postingId
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Endpoint that allows a logged in user to delete his postings
+      security:
+        - HTTPBasic: []
+components:
+  schemas:
+    errorDescription:
+      title: errorDescription model
+      type: object
+      description: Model containing an error message for Bad Request response
+      examples:
+        - errorDescription: Some data is missing or given data is incorrect
+      properties:
+        errorDescription:
+          type: string
+    user-post_put:
+      title: user model for POST/PUT operations
+      type: object
+      description: Model representing user without id
+      examples:
+        - firstName: John
+          lastName: Doe
+          dateOfBirth: '2012-09-27'
+          address:
+            street: Tutkijantie
+            city: Oulu
+            country: FIN
+          email: john@foo.com
+          password: password1234
+      properties:
+        firstName:
+          type: string
+          description: first name of the user
+          pattern: '^[A-Za-z]+'
+          example: John
+        lastName:
+          type: string
+          description: last name of the user
+          pattern: '^[A-Za-z]+'
+          example: Doe
+        dateOfBirth:
+          type: string
+          description: date of birth of the user according to ISO 8601
+          example: '2012-09-27'
+          minLength: 10
+          maxLength: 10
+        address:
+          type: object
+          description: address of the user divided into three parts
+          required:
+            - street
+            - city
+            - country
+          properties:
+            street:
+              type: string
+              description: street where the user lives
+              example: Tutkijantie
+              pattern: '^[A-Za-z]+'
+            city:
+              type: string
+              description: city where the use lives
+              example: Oulu
+              pattern: '^[A-Za-z]+'
+            country:
+              type: string
+              description: country where the user lives according to ISO 3166-1 alpha-3
+              example: FIN
+        email:
+          type: string
+          description: email of the user
+          format: email
+          example: john@foo.com
+        password:
+          type: string
+          description: password of the user
+          format: password
+          minLength: 8
+      required:
+        - firstName
+        - lastName
+        - dateOfBirth
+        - address
+        - email
+        - password
+    user-get:
+      title: user model for GET operation
+      type: object
+      description: Model representing user with id
+      examples:
+        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+          firstName: John
+          lastName: Doe
+          dateOfBirth: '2012-09-27'
+          address:
+            street: Tutkijantie
+            city: Oulu
+            country: FIN
+          email: john@foo.com
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: generated uuid
+        firstName:
+          type: string
+          description: first name of the user
+          pattern: '^[A-Za-z]+'
+          example: John
+        lastName:
+          type: string
+          description: last name of the user
+          pattern: '^[A-Za-z]+'
+          example: Doe
+        dateOfBirth:
+          type: string
+          description: date of birth of the user according to ISO 8601
+          example: '2012-09-27'
+          minLength: 10
+          maxLength: 10
+        address:
+          type: object
+          description: address of the user divided into three parts
+          required:
+            - street
+            - city
+            - country
+          properties:
+            street:
+              type: string
+              description: street where the user lives
+              example: Tutkijantie
+              pattern: '^[A-Za-z]+'
+            city:
+              type: string
+              description: city where the use lives
+              example: Oulu
+              pattern: '^[A-Za-z]+'
+            country:
+              type: string
+              description: country where the user lives according to ISO 3166-1 alpha-3
+              example: FIN
+        email:
+          type: string
+          description: email of the user
+          format: email
+          example: john@foo.com
+      required:
+        - firstName
+        - lastName
+        - dateOfBirth
+        - address
+        - email
+    id:
+      title: Id
+      type: object
+      properties:
+        id:
+          type: string
+          description: id of the user in uuid format
+          format: uuid
+      description: Model for returning id if user/item successfully created/update
+      examples:
+        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+    posting-post_put:
+      title: posting model for POST/PUT operations
+      type: object
+      description: Model representing posting without id
+      examples:
+        - title: Old table
+          description: Table is 6 years old but still in good quality!
+          category:
+            - furniture
+          location:
+            street: Tutkijantie
+            city: Oulu
+            country: FIN
+          images:
+            - iVBORw0KGgoAAAANSUhEUgAAB4AAAAQ4CAYAAADo08FDAAAABHNCSVQ...
+          askingPrice: 100.5
+          deliveryType:
+            shipping: true
+            pickup: true
+          sellerFirstName: Pepa
+          sellerLastName: Novak
+          sellerEmail: john@foo.com
+      properties:
+        title:
+          type: string
+          description: Title of posting
+          example: Old table
+          maxLength: 60
+        description:
+          type: string
+          description: Desciption of posting
+          example: Table is 6 years old but still in good quality!
+        category:
+          type: array
+          description: Category in which the posting belongs. Posting can belong to multiple categories
+          uniqueItems: true
+          items:
+            type: string
+            example: furniture
+        location:
+          type: object
+          description: Location from where the item from the posting can be picked up or shipped
+          required:
+            - street
+            - city
+            - country
+          properties:
+            street:
+              type: string
+              description: Street part of the location
+              example: Tutkijantie
+              pattern: '^[A-Za-z]+'
+            city:
+              type: string
+              description: City part of the location
+              pattern: '^[A-Za-z]+'
+              example: Oulu
+            country:
+              type: string
+              description: Country part of the location according to ISO 3166-1 alpha-3
+              example: FIN
+        images:
+          type: array
+          maxItems: 4
+          description: Images of the item that's being sold. User can add max 4 images. Image must be encoded in base64 format.
+          minItems: 1
+          items:
+            type: string
+            example: iVBORw0KGgoAAAANSUhEUgAAB4AAAAQ4CAYAAADo08FDAAAABHNCSVQ...
+        askingPrice:
+          type: number
+          description: Price of the item which is determined by a user who made the posting
+          format: double
+          example: 100.5
+          minimum: 1
+        deliveryType:
+          type: object
+          description: List of possisble types of delivery. Types are set with boolean flag
+          required:
+            - shipping
+            - pickup
+          properties:
+            shipping:
+              type: boolean
+              description: Shipping is set to true if the item can be shipped to the buyer
+            pickup:
+              type: boolean
+              description: Pickup is set to true if the item can be picked up from the seller
+        sellerFirstName:
+          type: string
+          pattern: '^[A-Za-z]+'
+          example: Pepa
+          description: First name of the seller
+        sellerLastName:
+          type: string
+          pattern: '^[A-Za-z]+'
+          example: Novak
+          description: Last name of the seller
+        sellerEmail:
+          type: string
+          description: Seller's email address
+          example: john@foo.com
+          format: email
+      required:
+        - title
+        - description
+        - category
+        - location
+        - images
+        - askingPrice
+        - deliveryType
+        - sellerFirstName
+        - sellerLastName
+        - sellerEmail
+    posting-get:
+      title: posting model for GET operation
+      type: object
+      description: Model representing posting with id
+      examples:
+        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+          title: Old table
+          description: Table is 6 years old but still in good quality!
+          category:
+            - furniture
+          location:
+            street: Tutkijantie
+            city: Oulu
+            country: FIN
+          images:
+            - string
+          askingPrice: 100.5
+          dateOfPosting: '2012-09-27'
+          deliveryType:
+            shipping: true
+            pickup: true
+          sellerFirstName: Pepa
+          sellerLastName: Novak
+          sellerEmail: john@foo.com
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique id of posting
+        dateOfPosting:
+          type: string
+          description: 'Date when the posting was added, follows ISO 8601 format'
+          example: '2012-09-27'
+          minLength: 10
+          maxLength: 10
+        title:
+          type: string
+          description: Title of posting
+          example: Old table
+          maxLength: 60
+        description:
+          type: string
+          description: Desciption of posting
+          example: Table is 6 years old but still in good quality!
+        category:
+          type: array
+          description: Category in which the posting belongs. Posting can belong to multiple categories
+          uniqueItems: true
+          items:
+            type: string
+            example: furniture
+        location:
+          type: object
+          description: Location from where the item from the posting can be picked up or shipped
+          required:
+            - street
+            - city
+            - country
+          properties:
+            street:
+              type: string
+              description: Street part of the location
+              example: Tutkijantie
+              pattern: '^[A-Za-z]+'
+            city:
+              type: string
+              description: City part of the location
+              pattern: '^[A-Za-z]+'
+              example: Oulu
+            country:
+              type: string
+              description: Country part of the location according to ISO 3166-1 alpha-3
+              example: FIN
+        images:
+          type: array
+          maxItems: 4
+          description: Images of the item that's being sold. User can add max 4 images. Images are encoded in base64
+          minItems: 1
+          items:
+            type: string
+            example: iVBORw0KGgoAAAANSUhEUgAAB4AAAAQ4CAYAAADo08FDAAAABHNCSVQ
+        askingPrice:
+          type: number
+          description: Price of the item which is determined by a user who made the posting
+          format: double
+          example: 100.5
+          minimum: 1
+        deliveryType:
+          type: object
+          description: List of possisble types of delivery. Types are set with boolean flag
+          required:
+            - shipping
+            - pickup
+          properties:
+            shipping:
+              type: boolean
+              description: Shipping is set to true if the item can be shipped to the buyer
+            pickup:
+              type: boolean
+              description: Pickup is set to true if the item can be picked up from the seller
+        sellerFirstName:
+          type: string
+          pattern: '^[A-Za-z]+'
+          example: Pepa
+          description: First name of the seller
+        sellerLastName:
+          type: string
+          pattern: '^[A-Za-z]+'
+          example: Novak
+          description: Last name of the seller
+        sellerEmail:
+          type: string
+          description: Seller's email address
+          example: john@foo.com
+          format: email
+      required:
+        - id
+        - dateOfPosting
+        - title
+        - description
+        - category
+        - location
+        - images
+        - askingPrice
+        - deliveryType
+        - sellerFirstName
+        - sellerLastName
+        - sellerEmail
+  securitySchemes:
+    HTTPBasic:
+      type: http
+      scheme: basic
