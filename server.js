@@ -17,7 +17,7 @@ const app = express()
 
 // if the application or tests are needed to be run, the port
 // has to be changed to 3000
-app.set('port',(process.env.PORT || 80))
+app.set('port',(process.env.PORT || 3000))
 
 app.use(bodyParser.json())
 
@@ -67,7 +67,7 @@ const secretKey = private.jwtSignKey */
 
 const options = {
     jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey : 'randomSecretKey'
+    secretOrKey : process.env.SECRET_KEY /* || secretKey, <--- for localhost*/
 }
 
 passport.use(new JwtStrategy(options, (payload, done) => {
