@@ -284,12 +284,15 @@ app.delete('/users/:id', passport.authenticate('jwt', { session: false }), (req,
 
 app.get('/postings', filterPostings, (req, res) => {
 
-    filteredPostings.forEach((posting,index, arr) => {
-        arr[index] = deepCopyImagesPosting(posting)
-        //arr[index].images = imageToBase64(posting.images) /* uncomment for local upload of files */
-        delete arr[index].userId
+    let returnedPostings = []
+
+    filteredPostings.forEach((posting,index) => {
+
+        returnedPostings.push(deepCopyImagesPosting(posting))
+        //returnedPostings[index].images = imageToBase64(posting.images) /* uncomment for local upload of files */
+        delete returnedPostings[index].userId
     })
-    res.status(200).json({ data : filteredPostings })
+    res.status(200).json({ data : returnedPostings })
 
 })
 
