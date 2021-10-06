@@ -17,6 +17,17 @@ const app = express()
 
 app.use(bodyParser.json())
 
+const Ajv = require('ajv')
+const ajv_user = new Ajv()
+const ajv_posting = new Ajv()
+
+const userSchema = require('./validation_schemas/userSchema.json')
+const userSchemaValidator = ajv_user.compile(userSchema)
+
+const postingSchema = require('./validation_schemas/postingSchema.json')
+const postingSchemaValidator = ajv_posting.compile(postingSchema)
+
+
 var users = []
 var postings = []
 var filteredPostings = []
@@ -60,8 +71,9 @@ passport.use(new JwtStrategy(options, (payload, done) => {
 
 }))
 
+/* Custom middlewares */
 
-function filterPostings (req, _, next) {
+function filterPostings (req, res, next) {
 
     filteredPostings = postings
 
@@ -83,12 +95,100 @@ function filterPostings (req, _, next) {
                  { value : req.query[element.paramName], key : element.paramName } )
         }
     })
-    console.log(req.query)
     next()
 }
 
+function validateUserMiddleware(req, res, next) {
 
-app.post('/users', (req, res) => {
+    const validUser = userSchemaValidator(req.body)
+    if(validUser)
+    {
+        next()
+    }
+    else
+    {
+        const propertyPath = userSchemaValidator.errors[0].instancePath.split('/')
+        let error = userSchemaValidator.errors[0].message
+
+        if(propertyPath[0] != userSchemaValidator.errors[0].instancePath)
+        {
+            error = propertyPath[propertyPath.length -1] + ' ' +  error
+        }
+
+        res.status(400).json({ errorDescription : error })
+    }
+}
+
+function validatePostingMiddleware (req, res, next) {
+
+    const validPosting = postingSchemaValidator(req.body)
+    if(validPosting)
+    {
+        next()
+    }
+    else
+    {
+        const propertyPath = postingSchemaValidator.errors[0].instancePath.split('/')
+        let error = postingSchemaValidator.errors[0].message
+
+        if(propertyPath[0] != postingSchemaValidator.errors[0].instancePath)
+        {
+            error = propertyPath[propertyPath.length -1] + ' ' +  error
+        }
+        res.status(400).json({ errorDescription : error })
+    }
+}
+
+/* Image processing */
+
+const fs = require('fs')
+
+function imageToBase64(imagePaths){
+
+    let imagesBase64 = []
+
+    for(const imagePath of imagePaths)
+    {
+        data = fs.readFileSync(imagePath)
+        imagesBase64.push(Buffer.from(data, 'binary').toString('base64'))
+    }
+    return imagesBase64
+}
+
+function base64toImage(images){
+
+    let pathsToImgs = []
+
+    for(const base64image of images)
+    {
+        const pathToImg = 'uploads/' + uuidv4() + '.png'
+        fs.writeFile(pathToImg, Buffer.from(base64image, 'base64'), function(err){
+            if(err){
+                console.error(err)
+            }
+        })
+        pathsToImgs.push(pathToImg)
+    }
+    return pathsToImgs
+}
+
+function deepCopyImagesPosting(posting)
+{
+    let deepCopiedImagesPosting = {}
+    for(const property in posting)
+    {
+        if(property != 'images')
+        {
+            deepCopiedImagesPosting[property] = posting[property]
+        }
+    }
+    deepCopiedImagesPosting.images = [...posting.images]
+    return deepCopiedImagesPosting
+}
+
+/* API routes */
+
+app.post('/users', validateUserMiddleware, (req, res) => {
 
     const salt = bcrypt.genSaltSync(5)
     const hashedPassword = bcrypt.hashSync(req.body.password, salt)
@@ -120,7 +220,7 @@ app.post('/login', passport.authenticate('basic', { session : false }), (req, re
 
 })
 
-app.get('/users/:id', /*passport.authenticate('jwt', { session: false }),*/ (req, res) => {
+app.get('/users/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
 
     const user = users.find(user => user.id === req.params.id)
     if(user == undefined)
@@ -131,12 +231,11 @@ app.get('/users/:id', /*passport.authenticate('jwt', { session: false }),*/ (req
     {
         returnedUser = Object.assign({}, user)
         delete returnedUser.password
-
         res.status(200).json(returnedUser)
     }
 })
 
-app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.put('/users/:id', validateUserMiddleware, passport.authenticate('jwt', { session: false }), (req, res) => {
 
     const user = users.find(user => user.id === req.params.id)
     if(user == undefined)
@@ -145,7 +244,7 @@ app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, re
     }
     else
     {
-        const salt = bcrypt.genSalt(5)
+        const salt = bcrypt.genSaltSync(5)
         const hashedPassword = bcrypt.hashSync(req.body.password, salt)
 
         user.firstName = req.body.firstName
@@ -170,7 +269,7 @@ app.delete('/users/:id', passport.authenticate('jwt', { session: false }), (req,
     }
     else
     {
-        users.splice(users.indexOf(user), 1, user)
+        users.splice(users.indexOf(user), 1)
         res.sendStatus(200)
     }
 
@@ -178,45 +277,63 @@ app.delete('/users/:id', passport.authenticate('jwt', { session: false }), (req,
 
 app.get('/postings', filterPostings, (req, res) => {
 
-    res.status(200).json(filteredPostings)
+    filteredPostings.forEach((posting,index, arr) => {
+        arr[index] = deepCopyImagesPosting(posting)
+        arr[index].images = imageToBase64(posting.images)
+        delete arr[index].userId
+    })
+    res.status(200).json({ data : filteredPostings })
 
 })
 
-app.post('/postings', /*passport.authenticate('jwt', { session: false }),*/ (req, res) => {
+app.post('/postings', validatePostingMiddleware, passport.authenticate('jwt', { session: false }), (req, res) => {
 
     const posting = {
         id : uuidv4(),
+        userId : req.user.id,
         dateOfPosting : new Date().toISOString().split('T')[0]
     }
 
     Object.assign(posting, req.body)
+    posting.images = base64toImage(posting.images)
     postings.push(posting)
     res.status(201).json({ id : posting.id })
 })
 
 app.get('/postings/:id', (req, res) => {
 
-    const posting = postings.find(posting => posting.id === req.params.id)
+    let posting = postings.find(posting => posting.id === req.params.id)
     if(posting == undefined)
     {
         res.sendStatus(404)
     }
     else
     {
+        posting = deepCopyImagesPosting(posting)
+        posting.images = imageToBase64(posting.images)
+        delete posting.userId
         res.status(200).json(posting)
     }
 })
 
-app.put('/postings/:id', /*passport.authenticate('jwt', { session: false }),*/ (req, res) => {
+app.put('/postings/:id', validatePostingMiddleware, passport.authenticate('jwt', { session: false }), (req, res) => {
 
     const posting = postings.find(posting => posting.id === req.params.id)
     if(posting == undefined)
     {
         res.sendStatus(404)
     }
+    // user is not allowed to to modify postings of others
+    else if(posting.userId != req.user.id)
+    {
+        res.sendStatus(401)
+    }
     else
     {
+        //delete the stored images
+        posting.images.forEach(imagePath => fs.unlinkSync(imagePath))
         Object.assign(posting, req.body)
+        posting.images = base64toImage(posting.images)
         res.status(200).json({ id : posting.id })
     }
 })
@@ -228,9 +345,16 @@ app.delete('/postings/:id', passport.authenticate('jwt', { session: false }),(re
     {
         res.sendStatus(404)
     }
+    // user is not allowed to to modify postings of others
+    else if(posting.userId != req.user.id)
+    {
+        res.sendStatus(401)
+    }
     else
     {
-        postings.splice(users.indexOf(posting), 1, posting)
+        // delete the stored images
+        posting.images.forEach(imagePath => fs.unlinkSync(imagePath))
+        postings.splice(postings.indexOf(posting), 1)
         res.sendStatus(200)
     }
 })
@@ -241,9 +365,7 @@ let serverInstance = null
 module.exports = {
 
     start : function(port) {
-        serverInstance = app.listen(port, () => {
-            console.log(`Example app listening at http://localhost:${port}`)
-        })
+        serverInstance = app.listen(port, () => {})
     },
 
     close : function() {

@@ -20,7 +20,14 @@ function isValidDate(date)
 
 function categoryFilter(element)
 {
-    return this.value.includes(element.category)
+    for(const category of this.value)
+    {
+        if (element.category.includes(category))
+        {
+            return true
+        }
+    }
+    return false
 }
 
 function locationFilter(element)
@@ -30,12 +37,12 @@ function locationFilter(element)
 
 function startDateFilter(element)
 {
-    return new Date(this.value).getTime() <= element.dateOfPosting.getTime()
+    return new Date(this.value).getTime() <= new Date(element.dateOfPosting).getTime()
 }
 
 function endDateFilter(element)
 {
-    return new Date(this.value).getTime() >= element.dateOfPosting.getTime()
+    return new Date(this.value).getTime() >= new Date(element.dateOfPosting).getTime()
 }
 
 module.exports = {
